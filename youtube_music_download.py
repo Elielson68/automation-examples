@@ -99,90 +99,160 @@ def baixar_musica():
             print("Aguardando botão de Download ficar pronto...")
             time.sleep(3)
 
-            try:
-                # Clicar no botão de download
-                btn_loading = WebDriverWait(driver, 20).until(
-                    EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Loading...')]"))
-                )
-                btn_loading.click()
-            except:
-                print("Deu erro ao clicar no botao download")
+            # ====================================================
+            # NOVA PARTE: RESOLVER O PROBLEMA DO "Loading..."
+            # ====================================================
+            print("\nAguardando o carregamento dos botões de download...")
 
-            btn_download = WebDriverWait(driver, 20).until(
+            # Esperar o elemento "Loading..." aparecer
+            try:
+                # Aguarda o texto "Loading..." aparecer
+                loading_element = WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Loading')]"))
+                )
+                print("Elemento 'Loading...' encontrado!")
+
+                # Obtém a posição do elemento
+                location = loading_element.location
+                size = loading_element.size
+
+                # Calcula o centro do elemento
+                center_x = location['x'] + size['width'] // 2
+                center_y = location['y'] + size['height'] // 2
+
+                print(f"Posição do Loading: X={center_x}, Y={center_y}")
+
+                # Move o mouse para o centro do elemento "Loading..."
+                pyautogui.moveTo(center_x, center_y, duration=1)
+                print("Mouse posicionado sobre 'Loading...'")
+
+                # Aguarda 10 segundos com o mouse parado
+                print("Aguardando 10 segundos para os botões aparecerem...")
+                for i in range(10, 0, -1):
+                    print(f"{i}...", end=" ", flush=True)
+                    time.sleep(1)
+                print("\nTempo aguardado!")
+
+            except Exception as e:
+                print(f"Elemento 'Loading...' não encontrado ou já passou. Continuando...")
+                print(f"Erro: {e}")
+
+                # Fallback: se não encontrar o "Loading...", tenta encontrar os botões de download
+                print("Tentando encontrar diretamente os botões de download...")
+
+            # Pequena pausa extra
+            time.sleep(2)
+
+            # Clicar no botão de download
+            btn_download = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Download')]"))
             )
             btn_download.click()
-
-            time.sleep(10)
+            time.sleep(5)
 
         except Exception as e:
             print(f"Tentando método alternativo...")
-            # Tentativa alternativa
-            input_url = WebDriverWait(driver, 3).until(
+            input_url = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//input[@name='url']"))
             )
             input_url.clear()
             input_url.send_keys(url_video)
             time.sleep(2)
 
-            btn_download = WebDriverWait(driver, 3).until(
+            btn_download = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']"))
             )
             btn_download.click()
-            time.sleep(1)
+            time.sleep(5)
+
+
 
         # PASSO 6: Selecionar formato MP4
-        # print("Selecionando formato MP4...")
+        # print("\nSelecionando formato MP4...")
         # try:
-        #     # Esperar a página de opções carregar
+        #     # Aguarda os botões de download aparecerem
         #     time.sleep(3)
         #
-        #     # Procurar botão de download MP4
-        #     btn_mp4 = WebDriverWait(driver, 5).until(
+        #     # Procura por botões MP4 (agora devem estar visíveis)
+        #     btn_mp4 = WebDriverWait(driver, 20).until(
         #         EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'download') and contains(text(), 'MP4')]"))
         #     )
+        #
+        #     # Move o mouse para o botão MP4 antes de clicar
+        #     location = btn_mp4.location
+        #     size = btn_mp4.size
+        #     center_x = location['x'] + size['width'] // 2
+        #     center_y = location['y'] + size['height'] // 2
+        #     pyautogui.moveTo(center_x, center_y, duration=0.5)
+        #     time.sleep(0.5)
+        #
         #     btn_mp4.click()
         #     print("Download MP4 iniciado!")
-        #     time.sleep(30)
+        #     time.sleep(10)
         #
         # except Exception as e:
         #     print(f"Tentando alternativa para MP4...")
         #     try:
-        #         # Algumas versões do site usam botões diferentes
-        #         btn_mp4 = WebDriverWait(driver, 3).until(
+        #         # Outra forma de encontrar o botão MP4
+        #         btn_mp4 = WebDriverWait(driver, 15).until(
         #             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'MP4')]"))
         #         )
+        #
+        #         # Move o mouse para o botão MP4
+        #         location = btn_mp4.location
+        #         size = btn_mp4.size
+        #         center_x = location['x'] + size['width'] // 2
+        #         center_y = location['y'] + size['height'] // 2
+        #         pyautogui.moveTo(center_x, center_y, duration=0.5)
+        #         time.sleep(0.5)
+        #
         #         btn_mp4.click()
-        #         time.sleep(1)
+        #         time.sleep(3)
         #
         #         # Clicar no link de download que aparece
-        #         link_download = WebDriverWait(driver, 3).until(
+        #         link_download = WebDriverWait(driver, 10).until(
         #             EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'download')]"))
         #         )
+        #
+        #         # Move o mouse para o link de download
+        #         location = link_download.location
+        #         size = link_download.size
+        #         center_x = location['x'] + size['width'] // 2
+        #         center_y = location['y'] + size['height'] // 2
+        #         pyautogui.moveTo(center_x, center_y, duration=0.5)
+        #         time.sleep(0.5)
+        #
         #         link_download.click()
         #         print("Download MP4 iniciado!")
-        #         time.sleep(30)
+        #         time.sleep(10)
         #
         #     except Exception as e:
         #         print(f"Erro ao baixar MP4: {e}")
         #         # Tenta baixar em MP3 se MP4 não funcionar
         #         try:
-        #             btn_mp3 = WebDriverWait(driver, 3).until(
+        #             btn_mp3 = WebDriverWait(driver, 10).until(
         #                 EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'MP3')]"))
         #             )
+        #
+        #             # Move o mouse para o botão MP3
+        #             location = btn_mp3.location
+        #             size = btn_mp3.size
+        #             center_x = location['x'] + size['width'] // 2
+        #             center_y = location['y'] + size['height'] // 2
+        #             pyautogui.moveTo(center_x, center_y, duration=0.5)
+        #             time.sleep(0.5)
+        #
         #             btn_mp3.click()
         #             print("Download MP3 iniciado!")
-        #             time.sleep(30)
+        #             time.sleep(10)
         #         except:
         #             print("Não foi possível iniciar o download.")
 
-        # PASSO 7: Verificar se o download começou
-
+        # PASSO 7: Verificar o download
         print("\nVerificando download...")
         downloads_path = os.path.expanduser("~/Downloads")
-        time.sleep(3)
+        time.sleep(5)
 
-        # Listar arquivos recentes na pasta Downloads
         try:
             arquivos = os.listdir(downloads_path)
             arquivos_ordenados = sorted([f for f in arquivos if os.path.isfile(os.path.join(downloads_path, f))],
@@ -200,77 +270,15 @@ def baixar_musica():
 
     except Exception as e:
         print(f"Ocorreu um erro: {e}")
-        print("\nDica: O site y2meta pode ter mudado sua interface. ")
+        print("\nDica: O site y2meta pode ter mudado sua interface.")
         print("Tente acessar manualmente: https://y2meta.is/pt")
-        print("Cole a URL: " + (url_video if 'url_video' in locals() else "URL não capturada"))
+        if 'url_video' in locals():
+            print(f"URL do vídeo: {url_video}")
 
     finally:
         print("\nFechando navegador...")
         driver.quit()
 
 
-def baixar_musica_simples():
-    """
-    Versão mais simples que abre manualmente o YouTube e copia a URL
-    """
-    print("=== VERSÃO SIMPLES ===\n")
-    print("1. O navegador vai abrir o YouTube")
-    print("2. Você precisa pesquisar manualmente 'Gorillaz Clint Eastwood'")
-    print("3. Copie a URL do vídeo")
-    print("4. O script vai abrir o y2meta para você")
-    print("5. Cole a URL e baixe o MP4")
-    print("\nPressione Enter para continuar...")
-    input()
-
-    # Configuração do Chrome
-    options = Options()
-    options.add_argument("--start-maximized")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_experimental_option('useAutomationExtension', False)
-
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
-
-    try:
-        # Abrir YouTube
-        print("Abrindo YouTube...")
-        driver.get("https://www.youtube.com")
-        print("\nPesquise pelo vídeo manualmente e depois cole a URL abaixo.")
-        print("Ou pressione Enter para pular para o y2meta.")
-
-        url_video = input("\nCole a URL do vídeo (ou pressione Enter para pular): ")
-
-        if url_video:
-            # Abrir y2meta
-            driver.execute_script("window.open('https://y2meta.is/pt');")
-            time.sleep(2)
-            driver.switch_to.window(driver.window_handles[1])
-
-            print("\nCole a URL no y2meta e faça o download manualmente.")
-            input("Pressione Enter quando terminar...")
-        else:
-            print("Abrindo y2meta...")
-            driver.get("https://y2meta.is/pt")
-            print("Faça o download manualmente.")
-            input("Pressione Enter quando terminar...")
-
-    except Exception as e:
-        print(f"Erro: {e}")
-
-    finally:
-        driver.quit()
-
-
 if __name__ == "__main__":
-    print("=== DOWNLOAD DE MÚSICA DO YOUTUBE ===\n")
-    print("Escolha uma opção:")
-    print("1 - Automático (tenta baixar automaticamente)")
-    print("2 - Semiautomático (você copia a URL)")
-
-    opcao = input("\nOpção (1 ou 2): ")
-
-    if opcao == '2':
-        baixar_musica_simples()
-    else:
-        baixar_musica()
+    baixar_musica()
