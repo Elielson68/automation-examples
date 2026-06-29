@@ -104,41 +104,64 @@ def baixar_musica():
             # ====================================================
             print("\nAguardando o carregamento dos botões de download...")
 
-            # Esperar o elemento "Loading..." aparecer
+            # ====================================================
+            # PARTE MODIFICADA: Resolver o problema do "Loading..." no iframe
+            # ====================================================
             try:
-                # Aguarda o texto "Loading..." aparecer
-                loading_element = WebDriverWait(driver, 15).until(
-                    EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Loading')]"))
+                print("Aguardando o carregamento dos botões de download...")
+
+                # Primeiro, encontrar o iframe
+                iframe = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, "//iframe[contains(@src, 'dlsrv.online')]"))
                 )
-                print("Elemento 'Loading...' encontrado!")
+                print("Iframe encontrado!")
 
-                # Obtém a posição do elemento
-                location = loading_element.location
-                size = loading_element.size
+                # Mudar para o iframe
+                driver.switch_to.frame(iframe)
+                print("Mudou para o iframe")
 
-                # Calcula o centro do elemento
-                center_x = location['x'] + size['width'] // 2
-                center_y = location['y'] + size['height'] // 2
+                # Agora procurar o botão "Loading..." dentro do iframe
+                try:
+                    loading_element = WebDriverWait(driver, 15).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, "//button[contains(@class, 'bg-[#5cb85c]') and @disabled]"))
+                    )
+                    print("Botão 'Loading...' encontrado dentro do iframe!")
 
-                print(f"Posição do Loading: X={center_x}, Y={center_y}")
+                    # Obtém a posição do elemento
+                    location = loading_element.location
+                    size = loading_element.size
 
-                # Move o mouse para o centro do elemento "Loading..."
-                pyautogui.moveTo(center_x, center_y, duration=1)
-                print("Mouse posicionado sobre 'Loading...'")
+                    # Calcula o centro do elemento
+                    center_x = location['x'] + size['width'] // 2
+                    center_y = location['y'] + size['height'] // 2
 
-                # Aguarda 10 segundos com o mouse parado
-                print("Aguardando 10 segundos para os botões aparecerem...")
-                for i in range(10, 0, -1):
-                    print(f"{i}...", end=" ", flush=True)
-                    time.sleep(1)
-                print("\nTempo aguardado!")
+                    print(f"Posição do Loading: X={center_x}, Y={center_y}")
+
+                    # Move o mouse para o centro do elemento "Loading..."
+                    pyautogui.moveTo(center_x, center_y, duration=1)
+                    print("Mouse posicionado sobre 'Loading...'")
+
+                    # Aguarda 10 segundos com o mouse parado
+                    print("Aguardando 10 segundos para os botões aparecerem...")
+                    for i in range(10, 0, -1):
+                        print(f"{i}...", end=" ", flush=True)
+                        time.sleep(1)
+                    print("\nTempo aguardado!")
+
+                except Exception as e:
+                    print(f"Erro ao encontrar o botão dentro do iframe: {e}")
+
+                # Sair do iframe para voltar ao contexto principal
+                driver.switch_to.default_content()
+                print("Saiu do iframe")
 
             except Exception as e:
-                print(f"Elemento 'Loading...' não encontrado ou já passou. Continuando...")
+                print(f"Iframe não encontrado. Continuando...")
                 print(f"Erro: {e}")
-
-                # Fallback: se não encontrar o "Loading...", tenta encontrar os botões de download
-                print("Tentando encontrar diretamente os botões de download...")
+            # ====================================================
+            # FIM DA PARTE MODIFICADA
+            # ====================================================
 
             # Pequena pausa extra
             time.sleep(2)
@@ -151,102 +174,8 @@ def baixar_musica():
             time.sleep(5)
 
         except Exception as e:
-            print(f"Tentando método alternativo...")
-            input_url = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, "//input[@name='url']"))
-            )
-            input_url.clear()
-            input_url.send_keys(url_video)
-            time.sleep(2)
-
-            btn_download = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']"))
-            )
-            btn_download.click()
-            time.sleep(5)
-
-
-
-        # PASSO 6: Selecionar formato MP4
-        # print("\nSelecionando formato MP4...")
-        # try:
-        #     # Aguarda os botões de download aparecerem
-        #     time.sleep(3)
-        #
-        #     # Procura por botões MP4 (agora devem estar visíveis)
-        #     btn_mp4 = WebDriverWait(driver, 20).until(
-        #         EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'download') and contains(text(), 'MP4')]"))
-        #     )
-        #
-        #     # Move o mouse para o botão MP4 antes de clicar
-        #     location = btn_mp4.location
-        #     size = btn_mp4.size
-        #     center_x = location['x'] + size['width'] // 2
-        #     center_y = location['y'] + size['height'] // 2
-        #     pyautogui.moveTo(center_x, center_y, duration=0.5)
-        #     time.sleep(0.5)
-        #
-        #     btn_mp4.click()
-        #     print("Download MP4 iniciado!")
-        #     time.sleep(10)
-        #
-        # except Exception as e:
-        #     print(f"Tentando alternativa para MP4...")
-        #     try:
-        #         # Outra forma de encontrar o botão MP4
-        #         btn_mp4 = WebDriverWait(driver, 15).until(
-        #             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'MP4')]"))
-        #         )
-        #
-        #         # Move o mouse para o botão MP4
-        #         location = btn_mp4.location
-        #         size = btn_mp4.size
-        #         center_x = location['x'] + size['width'] // 2
-        #         center_y = location['y'] + size['height'] // 2
-        #         pyautogui.moveTo(center_x, center_y, duration=0.5)
-        #         time.sleep(0.5)
-        #
-        #         btn_mp4.click()
-        #         time.sleep(3)
-        #
-        #         # Clicar no link de download que aparece
-        #         link_download = WebDriverWait(driver, 10).until(
-        #             EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'download')]"))
-        #         )
-        #
-        #         # Move o mouse para o link de download
-        #         location = link_download.location
-        #         size = link_download.size
-        #         center_x = location['x'] + size['width'] // 2
-        #         center_y = location['y'] + size['height'] // 2
-        #         pyautogui.moveTo(center_x, center_y, duration=0.5)
-        #         time.sleep(0.5)
-        #
-        #         link_download.click()
-        #         print("Download MP4 iniciado!")
-        #         time.sleep(10)
-        #
-        #     except Exception as e:
-        #         print(f"Erro ao baixar MP4: {e}")
-        #         # Tenta baixar em MP3 se MP4 não funcionar
-        #         try:
-        #             btn_mp3 = WebDriverWait(driver, 10).until(
-        #                 EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'MP3')]"))
-        #             )
-        #
-        #             # Move o mouse para o botão MP3
-        #             location = btn_mp3.location
-        #             size = btn_mp3.size
-        #             center_x = location['x'] + size['width'] // 2
-        #             center_y = location['y'] + size['height'] // 2
-        #             pyautogui.moveTo(center_x, center_y, duration=0.5)
-        #             time.sleep(0.5)
-        #
-        #             btn_mp3.click()
-        #             print("Download MP3 iniciado!")
-        #             time.sleep(10)
-        #         except:
-        #             print("Não foi possível iniciar o download.")
+            print(f"deu erro geral")
+            return
 
         # PASSO 7: Verificar o download
         print("\nVerificando download...")
