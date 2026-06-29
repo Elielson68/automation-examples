@@ -100,11 +100,6 @@ def baixar_musica():
             time.sleep(3)
 
             # ====================================================
-            # NOVA PARTE: RESOLVER O PROBLEMA DO "Loading..."
-            # ====================================================
-            print("\nAguardando o carregamento dos botões de download...")
-
-            # ====================================================
             # PARTE MODIFICADA: Resolver o problema do "Loading..." no iframe
             # ====================================================
             try:
@@ -144,7 +139,7 @@ def baixar_musica():
 
                     # Aguarda 10 segundos com o mouse parado
                     print("Aguardando 10 segundos para os botões aparecerem...")
-                    for i in range(10, 0, -1):
+                    for i in range(3, 0, -1):
                         print(f"{i}...", end=" ", flush=True)
                         time.sleep(1)
                     print("\nTempo aguardado!")
@@ -159,22 +154,57 @@ def baixar_musica():
             except Exception as e:
                 print(f"Iframe não encontrado. Continuando...")
                 print(f"Erro: {e}")
-            # ====================================================
-            # FIM DA PARTE MODIFICADA
-            # ====================================================
-
-            # Pequena pausa extra
-            time.sleep(2)
-
-            # Clicar no botão de download
-            btn_download = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Download')]"))
-            )
-            btn_download.click()
-            time.sleep(5)
+                return
 
         except Exception as e:
             print(f"deu erro geral")
+            return
+
+        # PASSO 6: Selecionar formato MP3 (AGORA DENTRO DO IFRAME)
+        print("Selecionando formato MP3...")
+        try:
+            # Primeiro, entrar no iframe novamente
+            iframe = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//iframe[contains(@src, 'dlsrv.online')]"))
+            )
+            driver.switch_to.frame(iframe)
+            print("Entrou no iframe para clicar no MP3")
+
+            # Esperar a página de opções carregar
+            time.sleep(3)
+
+            # Procurar botão de download MP3
+            btn_mp4 = WebDriverWait(driver, 15).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'bg-[#5cb85c]')]"))
+            )
+            btn_mp4.click()
+
+            time.sleep(1)
+
+            if len(driver.window_handles) > 2:
+                driver.switch_to.window(driver.window_handles[1])
+
+            time.sleep(1)
+
+            iframe = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//iframe[contains(@src, 'dlsrv.online')]"))
+            )
+            driver.switch_to.frame(iframe)
+
+            # Procurar botão de download MP3
+            btn_mp4 = WebDriverWait(driver, 15).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'bg-green-600')]"))
+            )
+            btn_mp4.click()
+
+            print("Download MP3 iniciado!")
+            time.sleep(10)
+
+            # Sair do iframe
+            driver.switch_to.default_content()
+
+        except Exception as e:
+            print(f"Erro ao tentar baixar o mp3...")
             return
 
         # PASSO 7: Verificar o download
