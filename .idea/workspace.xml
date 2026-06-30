@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ed70a3d8-52fa-425d-8905-d812bf2e34fd" name="Changes" comment="feat: modularizando os tempos add constantes, add variável para baixar outras músicas">
-      <change afterPath="$PROJECT_DIR$/wpp_automation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="ed70a3d8-52fa-425d-8905-d812bf2e34fd" name="Changes" comment="feat: versão inicial de automação no wpp">
+      <changelist_data name="Elielson Barbosa" email="elielsonbr.com@gmail.com" automatic="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,7 +20,13 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Elielson Barbosa &lt;elielsonbr.com@gmail.com&gt;" />
+      </list>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="SAVE_CHANGES_POLICY" value="STASH" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -35,6 +40,9 @@
     &quot;accountId&quot;: &quot;41017e0d-97bb-48f7-ba8d-14eb9f9404ad&quot;
   }
 }</component>
+  <component name="MaliciousPackageCheckinHandlerState">
+    <option name="packageCheck" value="true" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -53,7 +61,8 @@
     "Python.youtube_music_download.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master"
+    "git-widget-placeholder": "master",
+    "settings.editor.selected.configurable": "project.propVCSSupport.CommitDialog"
   }
 }]]></component>
   <component name="RunManager" selected="Python.youtube_music_download">
@@ -281,10 +290,29 @@
       <option name="project" value="LOCAL" />
       <updated>1782816042800</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="feat: ajustes no workspace.xml">
+      <option name="closed" value="true" />
+      <created>1782816137451</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1782816137451</updated>
+    </task>
+    <task id="LOCAL-00013" summary="feat: versão inicial de automação no wpp">
+      <option name="closed" value="true" />
+      <created>1782816173811</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1782816173811</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT_PROFILE" value="Project Default" />
+    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="initial commit" />
     <MESSAGE value="feat: add requirements" />
     <MESSAGE value="feat: add script que move o mouse automaticamente" />
@@ -296,7 +324,11 @@
     <MESSAGE value="feat: baixando música do youtube completo" />
     <MESSAGE value="feat: diminuindo tempo pro navegador fechar sozinho ao terminar o processo" />
     <MESSAGE value="feat: modularizando os tempos add constantes, add variável para baixar outras músicas" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: modularizando os tempos add constantes, add variável para baixar outras músicas" />
+    <MESSAGE value="feat: ajustes no workspace.xml" />
+    <MESSAGE value="feat: versão inicial de automação no wpp" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: versão inicial de automação no wpp" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
