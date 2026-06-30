@@ -224,8 +224,8 @@ def baixar_musica():
         except Exception as e:
             print(f"Erro ao verificar Downloads: {e}")
 
-        print("\nProcesso concluído! O navegador permanecerá aberto por 30 segundos.")
-        time.sleep(30)
+        print("\nProcesso concluído! O navegador permanecerá aberto por 5 segundos.")
+        time.sleep(5)
 
     except Exception as e:
         print(f"Ocorreu um erro: {e}")
