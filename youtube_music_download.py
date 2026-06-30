@@ -11,6 +11,12 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
 
+DRIVER_WAIT_BUTTON_TIME = 1
+DRIVER_WAIT_IFRAME_BUTTON_TIME = 1
+DRIVER_WAIT_IFRAME_TIME = 1
+music_name = "Gorillaz Clint Eastwood"
+
+
 def baixar_musica():
     # Configuração do Chrome para evitar detecção
     options = Options()
@@ -32,28 +38,28 @@ def baixar_musica():
         # PASSO 1: Abrir YouTube diretamente
         print("Abrindo YouTube...")
         driver.get("https://www.youtube.com")
-        time.sleep(2)
+        time.sleep(1)
 
         # Aceitar cookies se aparecer
         try:
-            btn_aceitar = WebDriverWait(driver, 3).until(
+            btn_aceitar = WebDriverWait(driver, DRIVER_WAIT_BUTTON_TIME).until(
                 EC.element_to_be_clickable((By.XPATH, "//button[contains(@aria-label, 'Aceitar')]"))
             )
             btn_aceitar.click()
-            time.sleep(2)
+            time.sleep(1)
         except:
             pass
 
         # PASSO 2: Pesquisar pela música
-        print("Pesquisando 'Gorillaz Clint Eastwood'...")
+        print(f"Pesquisando '{music_name}'...")
 
         #input("espera")
 
-        search_box = WebDriverWait(driver, 3).until(
+        search_box = WebDriverWait(driver, DRIVER_WAIT_BUTTON_TIME).until(
             EC.presence_of_element_located((By.XPATH, "//input[@name='search_query']"))
         )
         search_box.clear()
-        search_box.send_keys("Gorillaz Clint Eastwood")
+        search_box.send_keys(f"{music_name}")
         search_box.send_keys(Keys.RETURN)
         time.sleep(1)
 
@@ -61,14 +67,14 @@ def baixar_musica():
         print("Abrindo o primeiro vídeo...")
         try:
             # Tenta encontrar o primeiro vídeo da lista
-            primeiro_video = WebDriverWait(driver, 3).until(
+            primeiro_video = WebDriverWait(driver, DRIVER_WAIT_BUTTON_TIME).until(
                 EC.element_to_be_clickable((By.ID, "video-title"))
             )
             primeiro_video.click()
             time.sleep(1)
         except:
             # Alternativa: usar um seletor mais específico
-            primeiro_video = WebDriverWait(driver, 3).until(
+            primeiro_video = WebDriverWait(driver, DRIVER_WAIT_BUTTON_TIME).until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "ytd-video-renderer a#video-title"))
             )
             primeiro_video.click()
@@ -91,13 +97,13 @@ def baixar_musica():
 
         # Encontrar o campo de input
         try:
-            input_url = WebDriverWait(driver, 3).until(
+            input_url = WebDriverWait(driver, DRIVER_WAIT_BUTTON_TIME).until(
                 EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Pesquise ou cole o link do youtube aqui...']"))
             )
             input_url.clear()
             input_url.send_keys(url_video)
             print("Aguardando botão de Download ficar pronto...")
-            time.sleep(3)
+            time.sleep(1)
 
             # ====================================================
             # PARTE MODIFICADA: Resolver o problema do "Loading..." no iframe
@@ -106,7 +112,7 @@ def baixar_musica():
                 print("Aguardando o carregamento dos botões de download...")
 
                 # Primeiro, encontrar o iframe
-                iframe = WebDriverWait(driver, 10).until(
+                iframe = WebDriverWait(driver, DRIVER_WAIT_IFRAME_TIME).until(
                     EC.presence_of_element_located((By.XPATH, "//iframe[contains(@src, 'dlsrv.online')]"))
                 )
                 print("Iframe encontrado!")
@@ -117,7 +123,7 @@ def baixar_musica():
 
                 # Agora procurar o botão "Loading..." dentro do iframe
                 try:
-                    loading_element = WebDriverWait(driver, 15).until(
+                    loading_element = WebDriverWait(driver, DRIVER_WAIT_IFRAME_BUTTON_TIME).until(
                         EC.presence_of_element_located(
                             (By.XPATH, "//button[contains(@class, 'bg-[#5cb85c]') and @disabled]"))
                     )
@@ -134,14 +140,14 @@ def baixar_musica():
                     print(f"Posição do Loading: X={center_x}, Y={center_y}")
 
                     # Move o mouse para o centro do elemento "Loading..."
-                    pyautogui.moveTo(center_x, center_y, duration=1)
+                    pyautogui.moveTo(center_x, center_y, duration=0.3)
                     print("Mouse posicionado sobre 'Loading...'")
 
                     # Aguarda 10 segundos com o mouse parado
                     print("Aguardando 10 segundos para os botões aparecerem...")
                     for i in range(3, 0, -1):
                         print(f"{i}...", end=" ", flush=True)
-                        time.sleep(1)
+                        time.sleep(0.7)
                     print("\nTempo aguardado!")
 
                 except Exception as e:
@@ -164,17 +170,17 @@ def baixar_musica():
         print("Selecionando formato MP3...")
         try:
             # Primeiro, entrar no iframe novamente
-            iframe = WebDriverWait(driver, 10).until(
+            iframe = WebDriverWait(driver, DRIVER_WAIT_IFRAME_TIME).until(
                 EC.presence_of_element_located((By.XPATH, "//iframe[contains(@src, 'dlsrv.online')]"))
             )
             driver.switch_to.frame(iframe)
             print("Entrou no iframe para clicar no MP3")
 
             # Esperar a página de opções carregar
-            time.sleep(3)
+            time.sleep(1)
 
             # Procurar botão de download MP3
-            btn_mp4 = WebDriverWait(driver, 15).until(
+            btn_mp4 = WebDriverWait(driver, DRIVER_WAIT_IFRAME_BUTTON_TIME).until(
                 EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'bg-[#5cb85c]')]"))
             )
             btn_mp4.click()
@@ -186,13 +192,13 @@ def baixar_musica():
 
             time.sleep(1)
 
-            iframe = WebDriverWait(driver, 10).until(
+            iframe = WebDriverWait(driver, DRIVER_WAIT_IFRAME_TIME).until(
                 EC.presence_of_element_located((By.XPATH, "//iframe[contains(@src, 'dlsrv.online')]"))
             )
             driver.switch_to.frame(iframe)
 
             # Procurar botão de download MP3
-            btn_mp4 = WebDriverWait(driver, 15).until(
+            btn_mp4 = WebDriverWait(driver, DRIVER_WAIT_IFRAME_BUTTON_TIME).until(
                 EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'bg-green-600')]"))
             )
             btn_mp4.click()
@@ -210,7 +216,7 @@ def baixar_musica():
         # PASSO 7: Verificar o download
         print("\nVerificando download...")
         downloads_path = os.path.expanduser("~/Downloads")
-        time.sleep(5)
+        time.sleep(1)
 
         try:
             arquivos = os.listdir(downloads_path)
@@ -231,8 +237,7 @@ def baixar_musica():
         print(f"Ocorreu um erro: {e}")
         print("\nDica: O site y2meta pode ter mudado sua interface.")
         print("Tente acessar manualmente: https://y2meta.is/pt")
-        if 'url_video' in locals():
-            print(f"URL do vídeo: {url_video}")
+        return
 
     finally:
         print("\nFechando navegador...")
@@ -240,4 +245,9 @@ def baixar_musica():
 
 
 if __name__ == "__main__":
+
+    music = input("Digite o nome da música (deixe vazio para Clint Eastwood): ")
+    if music is not None and music != "":
+        music_name = music
+
     baixar_musica()
