@@ -96,7 +96,17 @@ def criar_driver():
 
     options = webdriver.ChromeOptions()
     options.add_argument(f"--user-data-dir={user_data_dir}")
-    return webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=options)
+
+    # Clicar em "Documento" no menu de anexo dispara um clique real no
+    # <input type="file"> interno do WhatsApp, o que abre o diálogo NATIVO
+    # do Windows para escolher arquivo — uma janela do SO, fora do controle
+    # do Selenium, que rouba o foco e trava o resto da automação. Isso
+    # intercepta esse diálogo antes que ele apareça, permitindo que o
+    # send_keys no input controle o upload normalmente.
+    driver.execute_cdp_cmd("Page.setInterceptFileChooserDialog", {"enabled": True})
+
+    return driver
 
 def abrir_whatsapp_web(driver):
     print("Abrindo WhatsApp Web...")
@@ -147,7 +157,7 @@ def anexar_pdf(driver, caminho_pdf):
 
     print("Enviando arquivo...")
     btn_enviar = WebDriverWait(driver, WAIT_BTN_ENVIAR).until(
-        EC.element_to_be_clickable((By.XPATH, "//span[@data-icon='send']"))
+        EC.element_to_be_clickable((By.XPATH, "//span[@data-icon='wds-ic-send-filled']"))
     )
     btn_enviar.click()
     print("Arquivo enviado com sucesso!")
