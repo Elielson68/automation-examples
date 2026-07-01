@@ -10,8 +10,8 @@ import locale
 import chromedriver_autoinstaller
 
 # CONFIGURAÇÕES GLOBAIS
-WAIT_SEARCH_BOX = 30
-WAIT_CONTATO = 8                      # tempo de espera por CADA candidato na busca
+WAIT_SEARCH_BOX = 10
+WAIT_CONTATO = 3                      # tempo de espera por CADA candidato na busca
 WAIT_BTN_ENVIAR = 10
 
 SLEEP_APOS_DIGITAR_CONTATO = 2
@@ -25,11 +25,9 @@ SLEEP_FINAL = 3
 # Ajuste o DDD/país do número conforme necessário caso a formatação
 # exibida pelo WhatsApp Web seja diferente da sua região.
 NUMERO_BRUTO = "984762085"
-NUMERO_FORMATADO = NUMERO_BRUTO[:5] + "-" + NUMERO_BRUTO[5:]   # 98476-2085
+NUMERO_FORMATADO = NUMERO_BRUTO[1:5] + "-" + NUMERO_BRUTO[5:]   # 8476-2085
 
 CANDIDATOS_CONTATO = [
-    "Elielson",
-    "Sísifo",
     NUMERO_BRUTO,
     NUMERO_FORMATADO,
 ]
@@ -50,7 +48,9 @@ def encontrar_primeiro_pdf():
 
 def localizar_caixa_busca(driver):
     return WebDriverWait(driver, WAIT_SEARCH_BOX).until(
-        EC.presence_of_element_located((By.XPATH, "//div[@contenteditable='true'][@data-tab]"))
+        EC.presence_of_element_located(
+            (By.XPATH, "//div[@data-testid='chat-list-search-container']//input[@type='text']")
+        )
     )
 
 def limpar_caixa_busca(search_box):
@@ -61,7 +61,8 @@ def limpar_caixa_busca(search_box):
 def localizar_contato(driver, candidatos):
     """
     Tenta, em ordem, cada nome/número da lista de candidatos na busca do WhatsApp.
-    Retorna o elemento clicável do primeiro que for encontrado, ou None se nenhum bater.
+    Retorna o elemento clicável do primeiro resultado da lista de busca, ou None
+    se nenhum candidato retornar resultado.
     """
     for candidato in candidatos:
         print(f"Procurando por '{candidato}'...")
@@ -73,7 +74,7 @@ def localizar_contato(driver, candidatos):
 
             elemento = WebDriverWait(driver, WAIT_CONTATO).until(
                 EC.element_to_be_clickable(
-                    (By.XPATH, f"//span[@title='{candidato}' or contains(@title, '{candidato}')]")
+                    (By.XPATH, "(//div[@id='pane-side']//div[@role='row'])[1]")
                 )
             )
             print(f"Contato encontrado com o termo '{candidato}'.")
