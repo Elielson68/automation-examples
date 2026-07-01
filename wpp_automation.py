@@ -11,7 +11,7 @@ import chromedriver_autoinstaller
 
 # CONFIGURAÇÕES GLOBAIS
 WAIT_SEARCH_BOX = 10
-WAIT_CONTATO = 3                      # tempo de espera por CADA candidato na busca
+WAIT_CONTATO = 20                      # tempo de espera por CADA candidato na busca
 WAIT_BTN_ENVIAR = 10
 
 SLEEP_APOS_DIGITAR_CONTATO = 2
@@ -21,14 +21,11 @@ SLEEP_APOS_ENVIAR_PDF = 5
 SLEEP_APOS_ENVIAR_MENSAGEM = 5
 SLEEP_FINAL = 3
 
-# Candidatos de busca, em ordem de prioridade.
-# Ajuste o DDD/país do número conforme necessário caso a formatação
+# Candidato de busca. Ajuste conforme necessário caso a formatação
 # exibida pelo WhatsApp Web seja diferente da sua região.
-NUMERO_BRUTO = "984762085"
-NUMERO_FORMATADO = NUMERO_BRUTO[1:5] + "-" + NUMERO_BRUTO[5:]   # 8476-2085
+NUMERO_FORMATADO = "8476-2085"
 
 CANDIDATOS_CONTATO = [
-    NUMERO_BRUTO,
     NUMERO_FORMATADO,
 ]
 
@@ -72,9 +69,13 @@ def localizar_contato(driver, candidatos):
             search_box.send_keys(candidato)
             time.sleep(SLEEP_APOS_DIGITAR_CONTATO)
 
+            # A primeira "row" da lista de resultados pode ser um cabeçalho de
+            # seção (ex: "Conversas"), que não é clicável e não tem gridcell.
+            # Por isso buscamos direto pelo primeiro gridcell clicável
+            # (tabindex="0"), que é o real item de contato/conversa.
             elemento = WebDriverWait(driver, WAIT_CONTATO).until(
                 EC.element_to_be_clickable(
-                    (By.XPATH, "(//div[@id='pane-side']//div[@role='row'])[1]")
+                    (By.XPATH, "(//div[@id='pane-side']//div[@role='gridcell'][@tabindex='0'])[1]")
                 )
             )
             print(f"Contato encontrado com o termo '{candidato}'.")
@@ -102,24 +103,47 @@ def abrir_whatsapp_web(driver):
     driver.get("https://web.whatsapp.com")
     input("Escaneie o QR Code no WhatsApp Web (se necessário) e pressione Enter...")
 
+def abrir_conversa(driver, contato):
+    contato.click()
+    time.sleep(SLEEP_APOS_CLICAR_CONTATO)
+    # Confirma que a conversa realmente abriu, esperando a caixa de digitar
+    # mensagem aparecer. Se o clique não tiver aberto nada, isso levanta
+    # TimeoutException em vez de seguir silenciosamente para o próximo passo.
+    WebDriverWait(driver, WAIT_CONTATO).until(
+        EC.presence_of_element_located(
+            (By.XPATH, "//div[@data-testid='conversation-compose-box-input']")
+        )
+    )
+
+def _tornar_interagivel(driver, elemento):
+    # O input de arquivo do "Documento" fica com display:none, e essa versão
+    # do ChromeDriver recusa send_keys em elemento de tamanho zero
+    # ("element not interactable: element has zero size"). Forçar visibilidade
+    # via JS não abre nenhum diálogo real, só libera a interação do Selenium.
+    driver.execute_script(
+        "arguments[0].style.display='block'; arguments[0].style.visibility='visible'; "
+        "arguments[0].style.opacity='1'; arguments[0].style.height='1px'; arguments[0].style.width='1px';",
+        elemento,
+    )
+
 def anexar_pdf(driver, caminho_pdf):
     print("Anexando arquivo...")
-    btn_anexar = driver.find_element(By.XPATH, "//div[@title='Anexar']")
+    btn_anexar = WebDriverWait(driver, WAIT_BTN_ENVIAR).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Anexar']"))
+    )
     btn_anexar.click()
     time.sleep(SLEEP_APOS_CLICAR_ANEXAR)
 
-    try:
-        btn_documento = driver.find_element(By.XPATH, "//input[@accept='*' and @type='file']")
-        btn_documento.send_keys(caminho_pdf)
-        time.sleep(SLEEP_APOS_ENVIAR_PDF)
-    except Exception as e:
-        print(f"Seletor padrão de anexo falhou ({e}), tentando caminho alternativo...")
-        btn_doc = driver.find_element(By.XPATH, "//div[@title='Documento']")
-        btn_doc.click()
-        time.sleep(SLEEP_APOS_CLICAR_ANEXAR)
-        input_file = driver.find_element(By.XPATH, "//input[@type='file']")
-        input_file.send_keys(caminho_pdf)
-        time.sleep(SLEEP_APOS_ENVIAR_PDF)
+    btn_documento = WebDriverWait(driver, WAIT_BTN_ENVIAR).until(
+        EC.presence_of_element_located((By.XPATH, "//button[@aria-label='Documento']"))
+    )
+    btn_documento.click()
+    time.sleep(SLEEP_APOS_CLICAR_ANEXAR)
+
+    input_file = driver.find_element(By.XPATH, "//input[@type='file' and not(contains(@accept, 'image'))]")
+    _tornar_interagivel(driver, input_file)
+    input_file.send_keys(caminho_pdf)
+    time.sleep(SLEEP_APOS_ENVIAR_PDF)
 
     print("Enviando arquivo...")
     btn_enviar = WebDriverWait(driver, WAIT_BTN_ENVIAR).until(
@@ -151,8 +175,7 @@ def enviar_pdf_whatsapp():
             print("Nenhum dos contatos/números configurados foi encontrado!")
             return
 
-        contato.click()
-        time.sleep(SLEEP_APOS_CLICAR_CONTATO)
+        abrir_conversa(driver, contato)
 
         anexar_pdf(driver, caminho_pdf)
 
