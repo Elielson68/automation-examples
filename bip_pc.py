@@ -1,3 +1,7 @@
+"""
+Manipulação dos comandos de som do sistema operacional usando Python.
+"""
+
 import winsound
 import time
 import random

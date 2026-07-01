@@ -1,3 +1,7 @@
+"""
+WEB SCRAPPING USANDO SELENIUM
+"""
+
 import os
 import time
 import pyautogui

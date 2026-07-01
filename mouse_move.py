@@ -1,3 +1,7 @@
+"""
+Manipulação dos perifericos do sistema operacional usando Python.
+"""
+
 import pyautogui
 import time
 

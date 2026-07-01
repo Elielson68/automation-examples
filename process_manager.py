@@ -1,3 +1,7 @@
+"""
+Manipulação de processos do sistema operacional usando Python.
+"""
+
 import psutil
 import os
 import time
